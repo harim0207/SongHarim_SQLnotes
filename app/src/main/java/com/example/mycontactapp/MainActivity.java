@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import static com.example.mycontactapp.DatabaseHelper.COLUMN_NAME_CONTACT;
+import static com.example.mycontactapp.DatabaseHelper.ID;
 import static com.example.mycontactapp.DatabaseHelper.TABLE_NAME;
 
 public class MainActivity extends AppCompatActivity {
@@ -79,5 +80,40 @@ public class MainActivity extends AppCompatActivity {
         builder.setMessage(message);
         builder.show();
 
+    }
+
+    public static final String EXTRA_NAME = "com.example.mycontactapp";
+
+    public void searchRecord(View view) {
+        Log.d("MyContactApp", "MainActivity: launching search");
+        Cursor curs = myDb.getAllData();
+        StringBuffer buffer = new StringBuffer();
+        if (editName.getText().toString().isEmpty() && editPhone.getText().toString().isEmpty()
+                && editAddress.getText().toString().isEmpty()) {
+            showMessage("Error", "Nothing to search for!");
+            return;
+        }
+
+        while (curs.moveToNext()){
+            if ((editName.getText().toString().isEmpty() || editName.getText().toString().equals(curs.getString(1)))
+                    && (editPhone.getText().toString().isEmpty() || editPhone.getText().toString().equals(curs.getString(2)))
+                    && (editAddress.getText().toString().isEmpty() || editAddress.getText().toString().equals(curs.getString(3))))
+            {
+                buffer.append("ID: " + curs.getString(0) + "\n" +
+                        "Name: " + curs.getString(1) + "\n" +
+                        "Phone number: " + curs.getString(2) + "\n" +
+                        "Home address: " + curs.getString(3) + "\n\n");
+            }
+        }
+
+        if (buffer.toString().isEmpty()) {
+            showMessage("Error", "No matches found");
+            return;
+        }
+        showMessage("Search results", buffer.toString());
+    }
+
+    public void clearContacts(View view) {
+        myDb.deleteData();
     }
 }
